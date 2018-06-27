@@ -60,3 +60,4 @@ fabric.properties
 /.idea/*
 /target/*
 /project/*/*.cache
+/project/project/target/*
