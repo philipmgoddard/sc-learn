@@ -3,21 +3,25 @@ package com.kindred.sclearn
 import breeze.linalg.DenseVector
 import RegressionMetrics._
 
-object Test {
+object Test extends App {
 
   val newObs = breeze.linalg.DenseMatrix((1.0, 4.3, 5.4), (1.2, 0.4, 0.3))
   val features = breeze.linalg.DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3))
   val outcome = breeze.linalg.DenseVector(0.3, 5.0)
-  val lr_predictor: LinearRegressionPredictor =  LinearRegressionEstimator().fit(features, outcome)
+  val lr_est: LinearRegressionEstimator =  LinearRegressionEstimator().fit(features, outcome)
 
-  val ypred: DenseVector[Double] = lr_predictor.predict(features)
+  val ypred: DenseVector[Double] = lr_est.predict(features)
+
+  val lr_est2 = LinearRegressionEstimator()
 
 //  val y: DenseVector[Double] = ???
 //  val ypred: DenseVector[Double] = ???
 
-  lr_predictor.score(ypred, outcome) // default: RMSE
-  lr_predictor.score(ypred, outcome, SSE) // custom
+  println(lr_est.score(ypred, outcome)) // default: RMSE
+  println(lr_est.score(ypred, outcome, SSE)) // custom
 
+  println(lr_est.coef)
+  //println(lr_est2.coef)
 
 }
 
