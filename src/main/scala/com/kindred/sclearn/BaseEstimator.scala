@@ -8,7 +8,7 @@ trait BaseEstimator{
 
   type Y <: BaseEstimator
 
-  def fit(X: DenseMatrix[Double], y: DenseVector[T]): Y
+  def fit(X: DenseMatrix[Double], y: DenseVector[T]):  Y
 
   def predict(X: DenseMatrix[Double]): DenseVector[T]
 

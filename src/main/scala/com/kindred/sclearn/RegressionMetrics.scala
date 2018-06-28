@@ -23,7 +23,7 @@ object RegressionMetrics {
   }
 
   def R2(yPred: DenseVector[Double], y: DenseVector[Double]) : Double = {
-    1.0f - SSE(yPred, y) / SSTO(yPred, y)
+    1.0f - SSE(yPred, y) / SSTO(y)
   }
 
 }

@@ -8,5 +8,5 @@ trait ClassificationEstimator extends BaseEstimator {
 
   type Y = BaseEstimator
 
-  def fit(X: DenseMatrix[Double], y: DenseVector[Int]): BaseEstimator
+  def fit(X: DenseMatrix[Double], y: DenseVector[Int]): ClassificationEstimator
 }

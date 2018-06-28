@@ -1,26 +1,42 @@
 package com.kindred.sclearn
 
 import breeze.linalg._
+import RegressionMetrics.RMSE
 
-// is there a nice way this can be masked from the public facing API?
-// make w private, default to None
-class LinearRegressionEstimator(w: Option[DenseVector[Double]] = None) extends RegressionEstimator {
 
-  // fit returns a new linear regression estimator object, which is actually fitted
-  override def fit(X: DenseMatrix[Double], y: DenseVector[Double]): LinearRegressionEstimator = {
+class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double = RMSE)
+  extends RegressionEstimator {
+
+  private var w: Option[DenseVector[Double]] = None
+  private var trainScore: Option[Double] = None
+
+  override def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  LinearRegressionEstimator = {
 
     // add a bias, and calculate coefficients using normal equation
     val ones = DenseVector.fill(X.rows){1.0}
     val Xbias = DenseMatrix.horzcat(new DenseMatrix(rows = X.rows, cols = 1, ones.toArray), X)
     val coef = {pinv(Xbias.t * Xbias)} * {Xbias.t} * y
 
-    new LinearRegressionEstimator(w = Option(coef))
+    // create fitted estimator to be returned
+    val trainedModel = new LinearRegressionEstimator()
+    trainedModel.w = Some(coef)
+
+    val trainPred = trainedModel.predict(X)
+    trainedModel.trainScore = Some(trainedModel.score(trainPred, y, scoreFunc))
+
+    trainedModel
 
   }
 
   // getter for coefficients
   def _coef: DenseVector[Double] = w match {
     case Some(c) => c
+    case None => throw new Exception("Not fitted!")
+  }
+
+  // getter for score
+  def _score: Double = trainScore match {
+    case Some(s) => s
     case None => throw new Exception("Not fitted!")
   }
 
@@ -46,6 +62,7 @@ class LinearRegressionEstimator(w: Option[DenseVector[Double]] = None) extends R
 
 object LinearRegressionEstimator {
 
-  def apply() : LinearRegressionEstimator = new LinearRegressionEstimator()
+  def apply(scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double = RMSE): LinearRegressionEstimator =
+    new LinearRegressionEstimator(scoreFunc)
 
 }

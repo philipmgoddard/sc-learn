@@ -10,7 +10,7 @@ trait RegressionEstimator extends BaseEstimator {
   type Y = RegressionEstimator
 
   // fitting a estimator will return a new estimator with members updated so can score
-  def fit(X: DenseMatrix[Double], y: DenseVector[Double]): RegressionEstimator
+  def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  RegressionEstimator
 
   override def predict(X: DenseMatrix[Double]): DenseVector[Double]
 
