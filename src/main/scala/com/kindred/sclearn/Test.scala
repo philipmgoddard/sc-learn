@@ -1,7 +1,9 @@
 package com.kindred.sclearn
 
-import breeze.linalg.DenseVector
+import breeze.linalg.{DenseVector, norm}
 import RegressionMetrics._
+import breeze.optimize._
+
 
 object Test extends App {
 
@@ -24,7 +26,18 @@ object Test extends App {
   println(lr_est._score)
   println(lr_est)
 
+
+
+  val f = new DiffFunction[DenseVector[Double]] {
+    def calculate(x: DenseVector[Double]) = {
+      (breeze.linalg.norm((x - 3d) :^ 2d,1d),(x * 2d) - 6d);
+    }
+  }
+
 }
+
+
+
 
 /*
  * GOAL: linear classifier and regression. Random forest for regression and classification.
