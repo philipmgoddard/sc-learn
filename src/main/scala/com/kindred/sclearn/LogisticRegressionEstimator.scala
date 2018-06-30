@@ -9,6 +9,7 @@ import breeze.optimize.DiffFunction
 import breeze.optimize.minimize
 
 
+
 class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy)
   extends ClassificationEstimator {
 
@@ -73,15 +74,21 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
 
     val predProbs = predictProb(X)
     // check if > 0.5 - if yes 1, else 0
-    ???
+    // see if nicer way to do this...
+    convert(breeze.numerics.I(predProbs :>= 0.5).toDenseVector, Int)
   }
 
   override def predictProb(X: DenseMatrix[Double]): DenseVector[Double] = {
-    // predictions are 1/ (1- exp(-score))
-    ???
+    // TODO: make a function to add bias, as very common operation
+    val ones = DenseVector.fill(X.rows){1.0d}
+    val Xbias = DenseMatrix.horzcat(new DenseMatrix(rows = X.rows, cols = 1, ones.toArray), X)
+
+    val XCoef = Xbias(*, ::) :* _coef
+    sigmoid(sum(XCoef(*, ::)))
   }
 
 }
+
 
 object LogisticRegressionEstimator {
 

@@ -1,8 +1,7 @@
 package com.kindred.sclearn
 
-import breeze.linalg.{DenseVector, norm}
+import breeze.linalg.{DenseMatrix, DenseVector, norm}
 import RegressionMetrics._
-import breeze.optimize._
 
 
 object Test extends App {
@@ -26,13 +25,14 @@ object Test extends App {
   println(lr_est._score)
   println(lr_est)
 
+  val HW_data = breeze.linalg.DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
+  val HW_outcome = breeze.linalg.DenseVector(1,0,1,1)
 
-
-  val f = new DiffFunction[DenseVector[Double]] {
-    def calculate(x: DenseVector[Double]) = {
-      (breeze.linalg.norm((x - 3d) :^ 2d,1d),(x * 2d) - 6d);
-    }
-  }
+  val logistic_est =  LogisticRegressionEstimator().fit(HW_data, HW_outcome)
+  print(logistic_est._coef)
+  print(logistic_est.predictProb(HW_data))
+  print(logistic_est.predict(HW_data))
+  //print(logistic_est.predictProb(HW_data))
 
 }
 
