@@ -2,7 +2,7 @@ package com.kindred.sclearn
 
 import breeze.linalg._
 import RegressionMetrics.RMSE
-import breeze.optimize.{DiffFunction, OptimizationOption, minimize}
+import breeze.optimize.{DiffFunction, L2Regularization, OptimizationOption, minimize}
 import com.kindred.sclearn.utils.addBias
 
 
@@ -15,11 +15,10 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
 
   override def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  LinearRegressionEstimator = {
 
-    // add a bias
+    // add bias
     val Xbias = addBias(X)
 
     // define cost function
-    // 1/2m * sum(ypred - y) ^2
     def costFunction(coef: DenseVector[Double]): Double = {
       val yPred = sum(Xbias * coef)
       1.0d / (2.0d * Xbias.rows) *  scala.math.pow(sum(yPred - y), 2.0d)
@@ -38,11 +37,8 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
       }
     }
 
-    // optimisation - uses LBFGS by default
-    // pass in variable args to pass to minimizer
+    // optimisation - uses LBFGS by default. pass in variable args to pass to minimizer
     val optimalCoef = minimize(f, DenseVector.fill(Xbias.cols){0.0d}, optOptions: _*)
-//    val optimalCoef = minimize(f, DenseVector.fill(Xbias.cols){0.0d}, L2Regularization)
-
 
     // create fitted estimator to be returned
     val trainedModel = new LinearRegressionEstimator(scoreFunc)
@@ -52,7 +48,6 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
     trainedModel.trainScore = Some(trainedModel.score(trainPred, y, scoreFunc))
 
     trainedModel
-
   }
 
   // getter for coefficients
@@ -68,19 +63,10 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
   }
 
 
+  // predict using fitted coefficients
   override def predict(X: DenseMatrix[Double]): DenseVector[Double] = {
-
-    val coef = w match {
-      case Some(c) => c
-      case None => throw new Exception("Not fitted!")
-    }
-
-    // add on the bias
     val Xbias = addBias(X)
-    // prediction_i =  sum_j (coef_j * X_ij)
-//    val Xw = Xbias(*, ::) :* coef
-//    sum(Xw(*, ::))
-    Xbias * coef
+    Xbias * _coef
   }
 
 }
@@ -89,7 +75,7 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
 object LinearRegressionEstimator {
 
   def apply(scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double = RMSE,
-            optOptions: List[OptimizationOption] = Nil ): LinearRegressionEstimator = {
+            optOptions: List[OptimizationOption] = List(L2Regularization(0.0001d)) ): LinearRegressionEstimator = {
     new LinearRegressionEstimator(scoreFunc, optOptions: _*)
   }
 
