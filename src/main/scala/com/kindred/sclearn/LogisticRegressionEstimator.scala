@@ -2,11 +2,9 @@ package com.kindred.sclearn
 
 import ClassificationMetrics.Accuracy
 import breeze.linalg._
-import breeze.numerics.exp
-import breeze.numerics.log1p
-import breeze.numerics.sigmoid
-import breeze.optimize.DiffFunction
-import breeze.optimize.minimize
+import breeze.numerics.{exp, log1p, sigmoid}
+import breeze.optimize.{DiffFunction, minimize}
+import utils.addBias
 
 
 
@@ -19,8 +17,7 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
   override def fit(X: DenseMatrix[Double], y: DenseVector[Int]):  LogisticRegressionEstimator = {
 
     // add a bias
-    val ones = DenseVector.fill(X.rows){1.0d}
-    val Xbias = DenseMatrix.horzcat(new DenseMatrix(rows = X.rows, cols = 1, ones.toArray), X)
+    val Xbias = addBias(X)
 
     // define cost function
     def costFunction(coef: DenseVector[Double]): Double = {
@@ -37,18 +34,19 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
     }
 
     // define breeze DiffFunction
+    // todo: seems grubby to me that XBias taken from outer scope?
     val f = new DiffFunction[DenseVector[Double]] {
        def calculate(coef: DenseVector[Double]): (Double, DenseVector[Double]) = {
          (costFunction(coef), costFunctionGradient(coef))
        }
     }
 
-    // minimize - uses LBFGS by default
+    // optimisation - uses LBFGS by default
     // TODO: allow user to pass arguments here
     val optimalCoef = minimize(f, DenseVector.fill(Xbias.cols){0.0d})
 
     // create fitted estimator to be returned
-    val trainedModel = new LogisticRegressionEstimator()
+    val trainedModel = new LogisticRegressionEstimator(scoreFunc)
     trainedModel.w = Some(optimalCoef)
 
     // training score
@@ -56,6 +54,18 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
     trainedModel.trainScore = Some(trainedModel.score(trainPred, y, scoreFunc))
 
     trainedModel
+  }
+
+  override def predict(X: DenseMatrix[Double]): DenseVector[Int] = {
+    val predProbs = predictProb(X)
+    // check if > 0.5 - if yes 1, else 0
+    convert(breeze.numerics.I(predProbs :>= 0.5).toDenseVector, Int)
+  }
+
+  override def predictProb(X: DenseMatrix[Double]): DenseVector[Double] = {
+    val Xbias = addBias(X)
+    val XCoef = Xbias(*, ::) :* _coef
+    sigmoid(sum(XCoef(*, ::)))
   }
 
   // getter for coefficients
@@ -70,22 +80,7 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
     case None => throw new Exception("Not fitted!")
   }
 
-  override def predict(X: DenseMatrix[Double]): DenseVector[Int] = {
 
-    val predProbs = predictProb(X)
-    // check if > 0.5 - if yes 1, else 0
-    // see if nicer way to do this...
-    convert(breeze.numerics.I(predProbs :>= 0.5).toDenseVector, Int)
-  }
-
-  override def predictProb(X: DenseMatrix[Double]): DenseVector[Double] = {
-    // TODO: make a function to add bias, as very common operation
-    val ones = DenseVector.fill(X.rows){1.0d}
-    val Xbias = DenseMatrix.horzcat(new DenseMatrix(rows = X.rows, cols = 1, ones.toArray), X)
-
-    val XCoef = Xbias(*, ::) :* _coef
-    sigmoid(sum(XCoef(*, ::)))
-  }
 
 }
 

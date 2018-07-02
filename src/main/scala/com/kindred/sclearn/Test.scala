@@ -2,18 +2,23 @@ package com.kindred.sclearn
 
 import breeze.linalg.{DenseMatrix, DenseVector, norm}
 import RegressionMetrics._
+import breeze.optimize.L2Regularization
 
 
 object Test extends App {
 
-  val newObs = breeze.linalg.DenseMatrix((1.0, 4.3, 5.4), (1.2, 0.4, 0.3))
-  val features = breeze.linalg.DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3))
-  val outcome = breeze.linalg.DenseVector(0.3, 5.0)
-  val lr_est =  LinearRegressionEstimator(scoreFunc = R2).fit(features, outcome)
+  //val newObs = breeze.linalg.DenseMatrix((1.0, 4.3, 5.4), (1.2, 0.4, 0.3))
+  val features = breeze.linalg.DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3), (6.6, 8.9, 2.1))
+  val outcome = breeze.linalg.DenseVector(0.3, 5.0, 4.9)
+  val lr_est =  LinearRegressionEstimator(scoreFunc = R2, optOptions = List(L2Regularization(0.001))).fit(features, outcome)
+  val lr_est2 =  LinearRegressionEstimator(scoreFunc = R2).fit(features, outcome)
+
+
 
   val ypred: DenseVector[Double] = lr_est.predict(features)
 
   //val lr_est2 = LinearRegressionEstimator()
+
 
 //  val y: DenseVector[Double] = ???
 //  val ypred: DenseVector[Double] = ???
