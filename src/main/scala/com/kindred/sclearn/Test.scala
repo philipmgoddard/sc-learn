@@ -1,6 +1,6 @@
 package com.kindred.sclearn
 
-import breeze.linalg.{DenseMatrix, DenseVector, norm}
+import breeze.linalg.{DenseMatrix, DenseVector}
 import RegressionMetrics._
 import breeze.optimize.L2Regularization
 
@@ -8,8 +8,8 @@ import breeze.optimize.L2Regularization
 object Test extends App {
 
   //val newObs = breeze.linalg.DenseMatrix((1.0, 4.3, 5.4), (1.2, 0.4, 0.3))
-  val features = breeze.linalg.DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3), (6.6, 8.9, 2.1))
-  val outcome = breeze.linalg.DenseVector(0.3, 5.0, 4.9)
+  val features = DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3), (6.6, 8.9, 2.1))
+  val outcome = DenseVector(0.3, 5.0, 4.9)
   val lr_est =  LinearRegressionEstimator(scoreFunc = R2, optOptions = List(L2Regularization(0.001))).fit(features, outcome)
   val lr_est2 =  LinearRegressionEstimator(scoreFunc = R2).fit(features, outcome)
 
@@ -30,8 +30,8 @@ object Test extends App {
   println(lr_est._score)
   println(lr_est)
 
-  val HW_data = breeze.linalg.DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
-  val HW_outcome = breeze.linalg.DenseVector(1,0,1,1)
+  val HW_data = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
+  val HW_outcome = DenseVector(1,0,1,1)
 
   val logistic_est =  LogisticRegressionEstimator().fit(HW_data, HW_outcome)
   print(logistic_est._coef)

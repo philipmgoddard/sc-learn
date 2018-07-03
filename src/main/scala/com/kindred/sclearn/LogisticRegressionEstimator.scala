@@ -3,12 +3,13 @@ package com.kindred.sclearn
 import ClassificationMetrics.Accuracy
 import breeze.linalg._
 import breeze.numerics.{exp, log1p, sigmoid}
-import breeze.optimize.{DiffFunction, minimize}
+import breeze.optimize.{DiffFunction, L2Regularization, OptimizationOption, minimize}
 import utils.addBias
 
 
 
-class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy)
+class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double,
+                                  optOptions: OptimizationOption*)
   extends ClassificationEstimator {
 
   private var w: Option[DenseVector[Double]] = None
@@ -34,7 +35,6 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
     }
 
     // define breeze DiffFunction
-    // todo: seems grubby to me that XBias taken from outer scope?
     val f = new DiffFunction[DenseVector[Double]] {
        def calculate(coef: DenseVector[Double]): (Double, DenseVector[Double]) = {
          (costFunction(coef), costFunctionGradient(coef))
@@ -43,10 +43,12 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
 
     // optimisation - uses LBFGS by default
     // TODO: allow user to pass arguments here
-    val optimalCoef = minimize(f, DenseVector.fill(Xbias.cols){0.0d})
+    val optimalCoef = minimize(fn = f,
+      init = DenseVector.fill(Xbias.cols){0.0d},
+      options = optOptions: _*)
 
     // create fitted estimator to be returned
-    val trainedModel = new LogisticRegressionEstimator(scoreFunc)
+    val trainedModel = new LogisticRegressionEstimator(scoreFunc, optOptions: _*)
     trainedModel.w = Some(optimalCoef)
 
     // training score
@@ -87,7 +89,8 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
 
 object LogisticRegressionEstimator {
 
-  def apply(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy): LogisticRegressionEstimator =
-    new LogisticRegressionEstimator(scoreFunc)
+  def apply(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy,
+            optOptions: List[OptimizationOption] = List(L2Regularization(0.0001d)) ): LogisticRegressionEstimator =
+    new LogisticRegressionEstimator(scoreFunc, optOptions: _*)
 
 }

@@ -10,6 +10,7 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
                                 optOptions: OptimizationOption*)
   extends RegressionEstimator {
 
+  // private vars holding fitted coefficients and training score
   private var w: Option[DenseVector[Double]] = None
   private var trainScore: Option[Double] = None
 
@@ -38,10 +39,12 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
     }
 
     // optimisation - uses LBFGS by default. pass in variable args to pass to minimizer
-    val optimalCoef = minimize(f, DenseVector.fill(Xbias.cols){0.0d}, optOptions: _*)
+    val optimalCoef = minimize(fn = f,
+      init = DenseVector.fill(Xbias.cols){0.0d},
+      options = optOptions: _*)
 
     // create fitted estimator to be returned
-    val trainedModel = new LinearRegressionEstimator(scoreFunc)
+    val trainedModel = new LinearRegressionEstimator(scoreFunc, optOptions: _*)
     trainedModel.w = Some(optimalCoef)
 
     val trainPred = trainedModel.predict(X)
