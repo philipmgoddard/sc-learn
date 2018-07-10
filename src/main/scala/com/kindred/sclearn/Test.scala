@@ -4,7 +4,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.RegressionMetrics._
 import breeze.optimize.{L1Regularization, L2Regularization}
 import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
-
+import com.kindred.sclearn.model_selection.KFold
 
 object Test extends App {
 
@@ -35,10 +35,37 @@ object Test extends App {
   val HW_outcome = DenseVector(1,0,1,1)
 
   val logistic_est =  LogisticRegressionEstimator(optOptions = List(L1Regularization(0.001))).fit(HW_data, HW_outcome)
-  print(logistic_est._coef)
-  print(logistic_est.predictProb(HW_data))
-  print(logistic_est.predict(HW_data))
+  println(logistic_est._coef)
+  println(logistic_est.predictProb(HW_data))
+  println(logistic_est.predict(HW_data))
   //print(logistic_est.predictProb(HW_data))
+
+
+  val kfTest = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0), (53.4, 161.2), (52.0, 12.0))
+
+  val kf = KFold()
+  println(kf.split(kfTest).toList)
+
+  val kf2 = KFold( nSplit = 6 )
+  println(kf2.split(kfTest).toList)
+
+  val kf3 = KFold(shuffle = false )
+  println(kf3.split(kfTest).toList)
+
+  def printFolds(X: DenseMatrix[Double], folds: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Unit = folds match{
+    case Stream.Empty => println("done")
+    case x #:: xs => {
+      println("")
+      println("test")
+      println(X(x._1, ::))
+      println("train")
+      println(X(x._2, ::))
+      printFolds(X, xs)
+    }
+  }
+
+  printFolds(kfTest, kf2.split(kfTest))
+  println(kf2.getNSplits)
 
 }
 
@@ -51,7 +78,8 @@ object Test extends App {
  * */
 // TODO: start implementing tests
 // TODO implement gridsearchCV. Think about how can hold all training metrics (CV scores, variable importance etc) within
-// TODO think how can do in parralel
 // TODO implement feature transformers. Fit, transform, as per sklearn
 // TODO implement pipelines. string together transformers, estimator to make something beautiful
+
+// TODO think how can do gridsearchCV in parallel??
 // TODO implement a couple more models... RF? Neural net?

@@ -3,41 +3,49 @@ package com.kindred.sclearn.model_selection
 import breeze.linalg.DenseMatrix
 
 
-/*
-sk-learn returns a generator with indices for slicing train/test from input.
+class KFold(nSplits: Int, shuffle: Boolean, randomState: Int) extends BaseCrossValidator {
 
-return a stream of tuples of indexedSeq for each fold
-i guess a stream is the right thing to return?
-
- */
+  // Set the seed on initilisation
+  scala.util.Random.setSeed(seed = randomState)
 
 
+  // generate a stream of (train_ix, test_ix) for slicing a breeze dense matrix
+  override def split(X: DenseMatrix[Double]): Stream[(IndexedSeq[Int], IndexedSeq[Int])] = {
 
-class KFold(n_splits: Int, shuffle: Boolean, random_state: Int) extends BaseCrossValidator {
+    if (X.rows < nSplits) throw new IllegalArgumentException("Cant have more splits than observations")
 
-  // this has a side effect.
-  scala.util.Random.setSeed(seed = random_state)
+    val nObs = X.rows
+    val obsPerFold = nObs / nSplits
+    val ix = if (shuffle) {
+      scala.util.Random.shuffle((0 until nObs).toVector)
+    } else {
+      (0 until nObs).toVector
+    }
 
-  val ix = 0 until X.rows
+    def _split(ixLo: Int, ixHi: Int, currSol: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Stream[(IndexedSeq[Int], IndexedSeq[Int])] = {
+      val posLo = scala.math.min(nObs, ixLo)
+      val posHi = scala.math.min(nObs, ixHi)
+      if (posLo == nObs) currSol
+      else {
+        val test = ix.slice(ixLo, posHi)
+        val train = ix.take(posLo) ++ ix.drop(posLo + obsPerFold)
+        _split(ixHi, ixHi + obsPerFold, currSol ++ Stream((test, train)))
+      }
+    }
 
-  val indexToSplit = if (shuffle) {
-    shuffleIndex(ix)
-
+    _split(0, obsPerFold, Stream.empty)
   }
 
 
-  def split(X: DenseMatrix[Double]):Stream[(Seq[Int], Seq[Int])] ={
+  // getter for number of splits.
+  override def getNSplits: Int = nSplits
 
-    n_splits
-    ???
+}
 
-    // build up the stream for the number of splits
-  }
+object KFold {
 
-
-
-  def shuffleIndex(ix: Seq[Int]): Seq[Int] = {
-    ???
+  def apply(nSplit: Int = 3, shuffle: Boolean = true, randomState: Int = 1234): KFold = {
+    new KFold(nSplit, shuffle, randomState)
   }
 
 }
