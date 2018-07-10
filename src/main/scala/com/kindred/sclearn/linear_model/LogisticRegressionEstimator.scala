@@ -10,6 +10,7 @@ import com.kindred.sclearn.helpers.helpers.addBias
 
 /* For L1 regularisation use optOptions = List(L1Regularisation(0.001d)),
  * For L2 (the default) use optOptions = List(L2Regularistaion(0.001d))
+ * TODO refactor so L1 or L2 is an explicit argument rather than passing through optimisation option
  */
 
 class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double,
