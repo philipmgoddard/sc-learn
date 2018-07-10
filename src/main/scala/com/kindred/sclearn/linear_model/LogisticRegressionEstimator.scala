@@ -1,12 +1,16 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.linear_model
 
-import ClassificationMetrics.Accuracy
 import breeze.linalg._
 import breeze.numerics.{exp, log1p, sigmoid}
 import breeze.optimize.{DiffFunction, L2Regularization, OptimizationOption, minimize}
-import utils.addBias
+import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
+import com.kindred.sclearn.estimator.ClassificationEstimator
+import com.kindred.sclearn.helpers.helpers.addBias
 
 
+/* For L1 regularisation use optOptions = List(L1Regularisation(0.001d)),
+ * For L2 (the default) use optOptions = List(L2Regularistaion(0.001d))
+ */
 
 class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double,
                                   optOptions: OptimizationOption*)
@@ -41,8 +45,7 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
        }
     }
 
-    // optimisation - uses LBFGS by default
-    // TODO: allow user to pass arguments here
+    // optimisation
     val optimalCoef = minimize(fn = f,
       init = DenseVector.fill(Xbias.cols){0.0d},
       options = optOptions: _*)
@@ -82,8 +85,6 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
     case None => throw new Exception("Not fitted!")
   }
 
-
-
 }
 
 
@@ -94,3 +95,4 @@ object LogisticRegressionEstimator {
     new LogisticRegressionEstimator(scoreFunc, optOptions: _*)
 
 }
+

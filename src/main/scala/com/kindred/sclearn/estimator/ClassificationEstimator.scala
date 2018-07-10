@@ -1,7 +1,7 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.estimator
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import ClassificationMetrics.Accuracy
+import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
 
 trait ClassificationEstimator extends BaseEstimator {
 

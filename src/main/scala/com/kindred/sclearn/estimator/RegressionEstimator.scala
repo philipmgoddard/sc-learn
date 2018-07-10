@@ -1,7 +1,7 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.estimator
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import com.kindred.sclearn.RegressionMetrics.RMSE
+import com.kindred.sclearn.metrics.RegressionMetrics.RMSE
 
 trait RegressionEstimator extends BaseEstimator {
 

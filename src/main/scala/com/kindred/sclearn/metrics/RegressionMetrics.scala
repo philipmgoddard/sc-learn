@@ -1,4 +1,4 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.metrics
 
 import breeze.linalg._
 import breeze.stats.mean
@@ -23,7 +23,7 @@ object RegressionMetrics {
   }
 
   def R2(yPred: DenseVector[Double], y: DenseVector[Double]) : Double = {
-    1.0f - SSE(yPred, y) / SSTO(y)
+    1.0d - SSE(yPred, y) / SSTO(y)
   }
 
 }

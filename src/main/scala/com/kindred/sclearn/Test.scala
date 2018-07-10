@@ -1,8 +1,9 @@
 package com.kindred.sclearn
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import RegressionMetrics._
-import breeze.optimize.L2Regularization
+import com.kindred.sclearn.metrics.RegressionMetrics._
+import breeze.optimize.{L1Regularization, L2Regularization}
+import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
 
 
 object Test extends App {
@@ -33,7 +34,7 @@ object Test extends App {
   val HW_data = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
   val HW_outcome = DenseVector(1,0,1,1)
 
-  val logistic_est =  LogisticRegressionEstimator().fit(HW_data, HW_outcome)
+  val logistic_est =  LogisticRegressionEstimator(optOptions = List(L1Regularization(0.001))).fit(HW_data, HW_outcome)
   print(logistic_est._coef)
   print(logistic_est.predictProb(HW_data))
   print(logistic_est.predict(HW_data))
@@ -42,18 +43,13 @@ object Test extends App {
 }
 
 
-
-
 /*
  * GOAL: linear classifier and regression. Random forest for regression and classification.
  * GridSearchCV, transformer, pipeline
  *
  *
  * */
-// TODO: implememnt an optimisation scheme for linear classification and regression
 // TODO: start implementing tests
-// TODO implement logistic regression.
-// TODO implement optimisation using breeze built in
 // TODO implement gridsearchCV. Think about how can hold all training metrics (CV scores, variable importance etc) within
 // TODO think how can do in parralel
 // TODO implement feature transformers. Fit, transform, as per sklearn

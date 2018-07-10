@@ -1,9 +1,10 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.linear_model
 
 import breeze.linalg._
-import RegressionMetrics.RMSE
-import breeze.optimize.{DiffFunction, L2Regularization, OptimizationOption, minimize}
-import com.kindred.sclearn.utils.addBias
+import breeze.optimize._
+import com.kindred.sclearn.metrics.RegressionMetrics.RMSE
+import com.kindred.sclearn.estimator.RegressionEstimator
+import com.kindred.sclearn.helpers.helpers.addBias
 
 
 class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double,
@@ -64,7 +65,6 @@ class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Dou
     case Some(s) => s
     case None => throw new Exception("Not fitted!")
   }
-
 
   // predict using fitted coefficients
   override def predict(X: DenseMatrix[Double]): DenseVector[Double] = {

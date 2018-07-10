@@ -1,8 +1,8 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.helpers
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 
-object utils {
+object helpers {
 
   def addBias(X: DenseMatrix[Double]): DenseMatrix[Double] = {
     val ones = DenseVector.fill(X.rows){1.0d}

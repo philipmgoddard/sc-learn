@@ -1,4 +1,4 @@
-package com.kindred.sclearn
+package com.kindred.sclearn.metrics
 
 import breeze.linalg._
 
