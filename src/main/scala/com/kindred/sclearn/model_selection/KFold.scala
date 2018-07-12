@@ -31,7 +31,7 @@ class KFold(nSplits: Int, shuffle: Boolean, randomState: Int) extends BaseCrossV
       }
     }
 
-    _split(0, obsPerFold, Stream.empty)
+    _split(ixLo = 0, ixHi = obsPerFold, currSol = Stream.empty)
   }
 
   // getter for number of splits.

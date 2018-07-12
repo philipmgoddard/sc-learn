@@ -52,7 +52,10 @@ object Test extends App {
   val kf3 = KFold(shuffle = false )
   println(kf3.split(kfTest).toList)
 
-  def printFolds(X: DenseMatrix[Double], folds: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Unit = folds match{
+
+
+  // would a foreach do the same thing?
+  def printFolds(X: DenseMatrix[Double], folds: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Unit = folds match {
     case Stream.Empty => println("done")
     case x #:: xs => {
       println("")
