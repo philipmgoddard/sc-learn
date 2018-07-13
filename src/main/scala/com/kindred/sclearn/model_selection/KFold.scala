@@ -22,18 +22,18 @@ class KFold(nSplits: Int, shuffle: Boolean, randomState: Int) extends BaseCrossV
       (0 until nObs).toVector
     }
 
-    def _split(ixLo: Int, ixHi: Int, currSol: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Stream[(IndexedSeq[Int], IndexedSeq[Int])] = {
-      val posLo = scala.math.min(nObs, ixLo)
-      val posHi = scala.math.min(nObs, ixHi)
-      if (posLo == nObs) currSol
-      else {
-        val test = ix.slice(ixLo, posHi)
-        val train = ix.take(posLo) ++ ix.drop(posLo + obsPerFold)
-        _split(ixHi, ixHi + obsPerFold, currSol ++ Stream((test, train)))
-      }
-    }
+    val splittingPoints = 0 to nObs by obsPerFold.max(1)
+    val loHi = splittingPoints.zip(splittingPoints.tail)
 
-    _split(ixLo = 0, ixHi = obsPerFold, currSol = Stream.empty)
+    {
+      loHi map (
+        x => {
+          val test = ix.slice(x._1, x._2)
+          val train = ix.take(x._1) ++ ix.drop(x._1 + obsPerFold)
+          (test, train)
+          })
+    }.toStream
+
   }
 
 
