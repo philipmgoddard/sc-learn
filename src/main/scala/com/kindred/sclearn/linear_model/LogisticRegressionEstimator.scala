@@ -2,6 +2,7 @@ package com.kindred.sclearn.linear_model
 
 import breeze.linalg._
 import breeze.numerics.{exp, log1p, sigmoid}
+import breeze.optimize.FirstOrderMinimizer.OptParams
 import breeze.optimize.{DiffFunction, L2Regularization, OptimizationOption, minimize}
 import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
 import com.kindred.sclearn.estimator.ClassificationEstimator
@@ -12,6 +13,8 @@ import com.kindred.sclearn.helpers.helpers.addBias
  * For L2 (the default) use optOptions = List(L2Regularistaion(0.001d))
  * TODO refactor so L1 or L2 is an explicit argument rather than passing through optimisation option
  */
+
+// maybe use OptParams instead od OptimizationOption?
 
 class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double,
                                   optOptions: OptimizationOption*)
@@ -38,6 +41,9 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
       val probs = sigmoid(xBeta)
       Xbias.t * (probs - convert(y, Double))
     }
+
+
+
 
     // define breeze DiffFunction
     val f = new DiffFunction[DenseVector[Double]] {
