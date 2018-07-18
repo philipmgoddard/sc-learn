@@ -6,7 +6,7 @@ import com.kindred.sclearn.metrics.RegressionMetrics.RMSE
 import com.kindred.sclearn.estimator.RegressionEstimator
 import com.kindred.sclearn.helpers.helpers.addBias
 
-
+// TODO make penalty and C explicit arguments. Raise an exception if try and access via optimisation options
 class LinearRegressionEstimator(scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double,
                                 optOptions: OptimizationOption*)
   extends RegressionEstimator {
