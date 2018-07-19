@@ -12,7 +12,7 @@ object Test extends App {
   val features = DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3), (6.6, 8.9, 2.1))
   val outcome = DenseVector(0.3, 5.0, 4.9)
 //  val lr_est =  LinearRegressionEstimator(scoreFunc = R2, optOptions = List(L2Regularization(0.001))).fit(features, outcome)
-  val lr_est =  LinearRegressionEstimator(scoreFunc = R2, penalty = "l2", C = 10.0).fit(features, outcome)
+  val lr_est =  LinearRegressionEstimator(penalty = "l2", C = 10.0).fit(features, outcome)
 
   val lr_est2 =  LinearRegressionEstimator(penalty="l1").fit(features, outcome)
 
@@ -26,12 +26,11 @@ object Test extends App {
 //  val y: DenseVector[Double] = ???
 //  val ypred: DenseVector[Double] = ???
 
-  println(lr_est.score(ypred, outcome)) // default: RMSE
-  println(lr_est.score(ypred, outcome, R2)) // custom
+  println(lr_est.score(ypred, outcome)) // default: R2
+  println(lr_est.score(ypred, outcome, RMSE)) // custom
 
   println(lr_est._coef)
-  println(lr_est._score)
-  println(lr_est.optOptions)
+//  println(lr_est.optOptions)
 //
 //  val HW_data = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
 //  val HW_outcome = DenseVector(1,0,1,1)

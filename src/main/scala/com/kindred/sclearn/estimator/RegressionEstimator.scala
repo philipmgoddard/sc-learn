@@ -1,7 +1,7 @@
 package com.kindred.sclearn.estimator
 
 import breeze.linalg.{DenseMatrix, DenseVector}
-import com.kindred.sclearn.metrics.RegressionMetrics.RMSE
+import com.kindred.sclearn.metrics.RegressionMetrics.R2
 
 trait RegressionEstimator extends BaseEstimator {
 
@@ -19,6 +19,6 @@ trait RegressionEstimator extends BaseEstimator {
     scoreFunc(yPred, y)
   }
 
-  override def defaultScore: (DenseVector[Double], DenseVector[Double]) => Double = RMSE _
+  override def defaultScore: (DenseVector[Double], DenseVector[Double]) => Double = R2 _
 
 }
