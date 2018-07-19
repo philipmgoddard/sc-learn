@@ -17,6 +17,7 @@ object Test extends App {
   val lr_est2 =  LinearRegressionEstimator(penalty="l1").fit(features, outcome)
 
 
+  println(lr_est)
 
   val ypred: DenseVector[Double] = lr_est.predict(features)
 

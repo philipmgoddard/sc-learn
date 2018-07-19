@@ -3,47 +3,57 @@ package com.kindred.sclearn.linear_model
 import breeze.linalg._
 import breeze.numerics.{exp, log1p, sigmoid}
 import breeze.optimize.FirstOrderMinimizer.OptParams
-import breeze.optimize.{DiffFunction, L2Regularization, OptimizationOption, minimize}
-import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
+import breeze.optimize.{DiffFunction, OptimizationOption, minimize}
 import com.kindred.sclearn.estimator.ClassificationEstimator
 import com.kindred.sclearn.helpers.helpers.addBias
 
 
-/* For L1 regularisation use optOptions = List(L1Regularisation(0.001d)),
- * For L2 (the default) use optOptions = List(L2Regularistaion(0.001d))
- * TODO refactor so L1 or L2 is an explicit argument rather than passing through optimisation option
- */
-
-// maybe use OptParams instead od OptimizationOption?
-
-class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double,
-                                  optOptions: OptimizationOption*)
+// todo: a lot of duplicate code between Linear and Logistic estimators- BaseLinearModel and then inherit?
+class LogisticRegressionEstimator(penalty: String, C: Double,
+                                  fitIntercept: Boolean, tol: Double,
+                                  maxIter: Integer, alpha: Double,
+                                  randomState: Integer)
   extends ClassificationEstimator {
 
+  if ((penalty != "l1") & (penalty != "l2")) throw new Exception("Only penalty = l1 or l2 allowed")
+
+  // fitted coefficients
   private var w: Option[DenseVector[Double]] = None
-  private var trainScore: Option[Double] = None
+
+  // set up the optimisation options to define L1 or L2 penalties
+  private val optOptions: OptimizationOption = {
+    OptimizationOption.fromOptParams(
+      OptParams(
+        batchSize = 512,
+        regularization = 1.0 / C,
+        alpha = alpha,
+        maxIterations = maxIter,
+        useL1 = if (penalty == "l1") true else false,
+        tolerance = tol,
+        useStochastic = false,
+        randomSeed = randomState
+      )
+    )
+  }
 
   override def fit(X: DenseMatrix[Double], y: DenseVector[Int]):  LogisticRegressionEstimator = {
 
-    // add a bias
-    val Xbias = addBias(X)
+    // add a bias if fitIntercept is true
+    val Xb = if (fitIntercept) addBias(X) else X
 
     // define cost function
     def costFunction(coef: DenseVector[Double]): Double = {
-      val xBeta = Xbias * coef
+      val xBeta = Xb * coef
       val expXBeta = exp(xBeta)
       -1.0d * sum((convert(y, Double) :* xBeta) - log1p(expXBeta))
     }
 
     // define gradient of cost function
     def costFunctionGradient(coef: DenseVector[Double]): DenseVector[Double] = {
-      val xBeta = Xbias * coef
+      val xBeta = Xb * coef
       val probs = sigmoid(xBeta)
-      Xbias.t * (probs - convert(y, Double))
+      Xb.t * (probs - convert(y, Double))
     }
-
-
-
 
     // define breeze DiffFunction
     val f = new DiffFunction[DenseVector[Double]] {
@@ -54,16 +64,12 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
 
     // optimisation
     val optimalCoef = minimize(fn = f,
-      init = DenseVector.fill(Xbias.cols){0.0d},
-      options = optOptions: _*)
+      init = DenseVector.fill(Xb.cols){0.0d},
+      options = optOptions)
 
     // create fitted estimator to be returned
-    val trainedModel = new LogisticRegressionEstimator(scoreFunc, optOptions: _*)
+    val trainedModel = new LogisticRegressionEstimator(penalty, C, fitIntercept, tol, maxIter, alpha, randomState)
     trainedModel.w = Some(optimalCoef)
-
-    // training score
-    val trainPred = trainedModel.predict(X)
-    trainedModel.trainScore = Some(trainedModel.score(trainPred, y, scoreFunc))
 
     trainedModel
   }
@@ -75,20 +81,23 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
   }
 
   override def predictProb(X: DenseMatrix[Double]): DenseVector[Double] = {
-    val Xbias = addBias(X)
-    val XCoef = Xbias(*, ::) :* _coef
+    val Xb = if (fitIntercept) addBias(X) else X
+    val XCoef = Xb(*, ::) :* _coef
     sigmoid(sum(XCoef(*, ::)))
   }
 
   // getter for coefficients
   def _coef: DenseVector[Double] = w match {
-    case Some(c) => c
+    case Some(c) =>
+      val wSize = w.size
+      if (fitIntercept) c(1 until wSize) else c
     case None => throw new Exception("Not fitted!")
   }
 
-  // getter for score
-  def _score: Double = trainScore match {
-    case Some(s) => s
+  // getter for intercept, if it is present
+  def _intercept: Double = w match {
+    case Some(c) =>
+      if (fitIntercept) c(0) else throw new Exception("fitIntercept = false")
     case None => throw new Exception("Not fitted!")
   }
 
@@ -97,9 +106,21 @@ class LogisticRegressionEstimator(scoreFunc: (DenseVector[Int], DenseVector[Int]
 
 object LogisticRegressionEstimator {
 
-  def apply(scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy,
-            optOptions: List[OptimizationOption] = List(L2Regularization(0.0001d)) ): LogisticRegressionEstimator =
-    new LogisticRegressionEstimator(scoreFunc, optOptions: _*)
+  def apply(penalty: String = "l2",
+            C: Double = 1.0,
+            fitIntercept: Boolean = true,
+            tol: Double = 1E-5,
+            maxIter: Integer = 1000,
+            alpha: Double = 0.5,
+            randomState: Integer = 1234): LogisticRegressionEstimator = {
+
+    new LogisticRegressionEstimator(
+      penalty = penalty, C = C,
+      fitIntercept = fitIntercept, tol = tol,
+      maxIter = maxIter, alpha = alpha,
+      randomState=randomState)
+  }
+
 
 }
 
