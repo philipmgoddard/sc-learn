@@ -13,64 +13,40 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
                                   fitIntercept: Boolean, tol: Double,
                                   maxIter: Integer, alpha: Double,
                                   randomState: Integer)
-  extends ClassificationEstimator {
+  extends ClassificationEstimator with LinearModel {
 
-  if ((penalty != "l1") & (penalty != "l2")) throw new Exception("Only penalty = l1 or l2 allowed")
+  // check penalty valid, initialise OptimizationOption object
+  checkPenalty(penalty)
+  private val optOptions = prepOptOptions(penalty, C, alpha, maxIter, tol, randomState)
 
   // fitted coefficients
   private var w: Option[DenseVector[Double]] = None
 
-  // set up the optimisation options to define L1 or L2 penalties
-  private val optOptions: OptimizationOption = {
-    OptimizationOption.fromOptParams(
-      OptParams(
-        batchSize = 512,
-        regularization = 1.0 / C,
-        alpha = alpha,
-        maxIterations = maxIter,
-        useL1 = if (penalty == "l1") true else false,
-        tolerance = tol,
-        useStochastic = false,
-        randomSeed = randomState
-      )
-    )
-  }
-
+  /* some docstring
+   *
+   * */
   override def fit(X: DenseMatrix[Double], y: DenseVector[Int]):  LogisticRegressionEstimator = {
 
     // add a bias if fitIntercept is true
     val Xb = if (fitIntercept) addBias(X) else X
 
     // define cost function
-    def costFunction(coef: DenseVector[Double]): Double = {
-      val xBeta = Xb * coef
+    def costFunction(coef: DenseVector[Double], X: DenseMatrix[Double]): Double = {
+      val xBeta = X * coef
       val expXBeta = exp(xBeta)
       -1.0d * sum((convert(y, Double) :* xBeta) - log1p(expXBeta))
     }
 
     // define gradient of cost function
-    def costFunctionGradient(coef: DenseVector[Double]): DenseVector[Double] = {
-      val xBeta = Xb * coef
+    def costFunctionGradient(coef: DenseVector[Double], X: DenseMatrix[Double]): DenseVector[Double] = {
+      val xBeta = X * coef
       val probs = sigmoid(xBeta)
-      Xb.t * (probs - convert(y, Double))
+      X.t * (probs - convert(y, Double))
     }
 
-    // define breeze DiffFunction
-    val f = new DiffFunction[DenseVector[Double]] {
-       def calculate(coef: DenseVector[Double]): (Double, DenseVector[Double]) = {
-         (costFunction(coef), costFunctionGradient(coef))
-       }
-    }
-
-    // optimisation
-    val optimalCoef = minimize(fn = f,
-      init = DenseVector.fill(Xb.cols){0.0d},
-      options = optOptions)
-
-    // create fitted estimator to be returned
+    val optimalCoef = optimiseLinearModel(costFunction, costFunctionGradient, Xb, optOptions)
     val trainedModel = new LogisticRegressionEstimator(penalty, C, fitIntercept, tol, maxIter, alpha, randomState)
     trainedModel.w = Some(optimalCoef)
-
     trainedModel
   }
 
@@ -87,19 +63,10 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
   }
 
   // getter for coefficients
-  def _coef: DenseVector[Double] = w match {
-    case Some(c) =>
-      val wSize = w.size
-      if (fitIntercept) c(1 until wSize) else c
-    case None => throw new Exception("Not fitted!")
-  }
+  def _coef: DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
-  def _intercept: Double = w match {
-    case Some(c) =>
-      if (fitIntercept) c(0) else throw new Exception("fitIntercept = false")
-    case None => throw new Exception("Not fitted!")
-  }
+  def _intercept: Double = extractIntercept(w, fitIntercept)
 
 }
 

@@ -18,8 +18,12 @@ object Test extends App {
 
 
   println(lr_est)
+  println("hello")
+  println(features)
 
   val ypred: DenseVector[Double] = lr_est.predict(features)
+
+  println(ypred)
 
   //val lr_est2 = LinearRegressionEstimator()
 
