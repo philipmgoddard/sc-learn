@@ -74,7 +74,6 @@ object LinearRegressionEstimator {
             maxIter: Integer = 1000,
             alpha: Double = 0.5,
             randomState: Integer = 1234): LinearRegressionEstimator = {
-
     new LinearRegressionEstimator(
       penalty = penalty, C = C,
       fitIntercept = fitIntercept, tol = tol,
@@ -82,4 +81,28 @@ object LinearRegressionEstimator {
       randomState=randomState)
   }
 
+//  def apply(penalty: Any = "l2",
+//            C: Any = 1.0,
+//            fitIntercept: Any = true,
+//            tol: Any = 1E-5,
+//            maxIter: Any = 1000,
+//            alpha: Any = 0.5,
+//            randomState: Any = 1234): LinearRegressionEstimator = {
+//    new LinearRegressionEstimator(
+//      penalty = penalty.asInstanceOf[String], C = C.asInstanceOf[Double],
+//      fitIntercept = fitIntercept.asInstanceOf[Boolean], tol = tol.asInstanceOf[Double],
+//      maxIter = maxIter.asInstanceOf[Int], alpha = alpha.asInstanceOf[Double],
+//      randomState = randomState.asInstanceOf[Int])
+//  }
+
+  def apply(paramMap: Map[String, Any]): LinearRegressionEstimator = {
+    new LinearRegressionEstimator(
+      penalty = paramMap.getOrElse("penalty", "l2").asInstanceOf[String],
+      C = paramMap.getOrElse("C", 1.0).asInstanceOf[Double],
+      fitIntercept = paramMap.getOrElse("fitIntercept", true).asInstanceOf[Boolean],
+      tol = paramMap.getOrElse("tol", 1E-5).asInstanceOf[Double],
+      maxIter = paramMap.getOrElse("maxIter", 1000).asInstanceOf[Int],
+      alpha = paramMap.getOrElse("alpha", 0.5).asInstanceOf[Double],
+      randomState = paramMap.getOrElse("randomState", 1234).asInstanceOf[Int])
+  }
 }

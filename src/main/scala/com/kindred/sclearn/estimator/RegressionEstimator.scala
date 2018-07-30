@@ -3,14 +3,12 @@ package com.kindred.sclearn.estimator
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.RegressionMetrics.R2
 
-trait RegressionEstimator extends BaseEstimator {
-
-  type T = Double
+trait RegressionEstimator extends BaseEstimator[Double] {
 
   type Y = RegressionEstimator
 
   // fitting a estimator will return a new estimator with members updated so can score
-  def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  RegressionEstimator
+  override def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  RegressionEstimator
 
   override def predict(X: DenseMatrix[Double]): DenseVector[Double]
 

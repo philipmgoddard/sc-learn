@@ -3,7 +3,9 @@ package com.kindred.sclearn
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.RegressionMetrics._
 import breeze.optimize.{L1Regularization, L2Regularization}
+import com.kindred.sclearn.estimator.BaseEstimator
 import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
+import com.kindred.sclearn.metrics.{ClassificationMetrics, RegressionMetrics}
 import com.kindred.sclearn.model_selection.KFold
 
 object Test extends App {
@@ -14,7 +16,7 @@ object Test extends App {
 //  val lr_est =  LinearRegressionEstimator(scoreFunc = R2, optOptions = List(L2Regularization(0.001))).fit(features, outcome)
   val lr_est =  LinearRegressionEstimator(penalty = "l2", C = 10.0).fit(features, outcome)
 
-  val lr_est2 =  LinearRegressionEstimator(penalty="l1").fit(features, outcome)
+  val lr_est2 =  LinearRegressionEstimator(Map("penalty" -> "l1", "C" -> 10.0)).fit(features, outcome)
 
 
   println(lr_est)
@@ -47,35 +49,59 @@ object Test extends App {
 //  //print(logistic_est.predictProb(HW_data))
 //
 //
-//  val kfTest = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0), (53.4, 161.2), (52.0, 12.0))
-//
-//  val kf = KFold()
-//  println(kf.split(kfTest).toList)
-//
-//  val kf2 = KFold( nSplit = 6 )
-//  println(kf2.split(kfTest).toList)
-//
-//  val kf3 = KFold(shuffle = false )
-//  println(kf3.split(kfTest).toList)
-//
-//
-//
-//  // would a foreach do the same thing?
-//  def printFolds(X: DenseMatrix[Double], folds: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Unit = folds match {
-//    case Stream.Empty => println("done")
-//    case x #:: xs => {
-//      println("")
-//      println("test")
-//      println(X(x._1, ::))
-//      println("train")
-//      println(X(x._2, ::))
-//      printFolds(X, xs)
-//    }
-//  }
-//
+  val kfTest = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0), (53.4, 161.2), (52.0, 12.0))
+
+  val x = 1
+
+  val kf = KFold()
+  println(kf.split(kfTest).toList)
+
+  val kf2 = KFold( nSplit = 6 )
+  println(kf2.split(kfTest).toList)
+
+  val kf3 = KFold(shuffle = false )
+  println(kf3.split(kfTest).toList)
+
+  val tmp = kf3.split(kfTest)
+
+  val tt = kfTest(tmp(0)._1, ::).toDenseMatrix
+
+
+  // would a foreach do the same thing?
+  def printFolds(X: DenseMatrix[Double], folds: Stream[(IndexedSeq[Int], IndexedSeq[Int])]): Unit = folds match {
+    case Stream.Empty => println("done")
+    case x #:: xs => {
+      println("")
+      println("test")
+      println(X(x._1, ::))
+      println("train")
+      println(X(x._2, ::))
+      printFolds(X, xs)
+    }
+  }
+
+  kf2.split(kfTest).foreach{case (x,y) =>
+    println("")
+    println("test")
+    println(kfTest(x, ::))
+    println("train")
+    println(kfTest(y, ::))
+  }
+
 //  printFolds(kfTest, kf2.split(kfTest))
 //  println(kf2.getNSplits)
+
+
+//  val e  = LinearRegressionEstimator()
 //
+//  val yPred: DenseVector[Double] = ???
+//
+//  val scoring = RegressionMetrics.RMSE _
+//
+//  val ee = GridSearchCV(e, scoring)
+
+//  ee
+
 }
 //
 //
@@ -89,6 +115,18 @@ object Test extends App {
 //// TODO implement gridsearchCV. Think about how can hold all training metrics (CV scores, variable importance etc) within
 //// TODO implement feature transformers. Fit, transform, as per sklearn
 //// TODO implement pipelines. string together transformers, estimator to make something beautiful
+//   TODO: implicits for scoring ordering- to say if small or big is better
 //
 //// TODO think how can do gridsearchCV in parallel??
 //// TODO implement a couple more models... RF? Neural net?
+
+//class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V) {
+//  def run(): V = ???
+//}
+//
+//object GridSearchCV {
+//
+//  def apply[T, V <: BaseEstimator[T]](estimator: V, scoring: (DenseVector[T], DenseVector[T]) => Double): V =
+//    new GridSearchCV[T, V](estimator).run()
+//
+//}

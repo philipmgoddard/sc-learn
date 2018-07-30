@@ -80,12 +80,22 @@ object LogisticRegressionEstimator {
             maxIter: Integer = 1000,
             alpha: Double = 0.5,
             randomState: Integer = 1234): LogisticRegressionEstimator = {
-
     new LogisticRegressionEstimator(
       penalty = penalty, C = C,
       fitIntercept = fitIntercept, tol = tol,
       maxIter = maxIter, alpha = alpha,
       randomState=randomState)
+  }
+
+  def apply(paramMap: Map[String, Any]): LogisticRegressionEstimator = {
+    new LogisticRegressionEstimator(
+      penalty = paramMap.getOrElse("penalty", "l2").asInstanceOf[String],
+      C = paramMap.getOrElse("C", 1.0).asInstanceOf[Double],
+      fitIntercept = paramMap.getOrElse("fitIntercept", true).asInstanceOf[Boolean],
+      tol = paramMap.getOrElse("tol", 1E-5).asInstanceOf[Double],
+      maxIter = paramMap.getOrElse("maxIter", 1000).asInstanceOf[Int],
+      alpha = paramMap.getOrElse("alpha", 0.5).asInstanceOf[Double],
+      randomState = paramMap.getOrElse("randomState", 1234).asInstanceOf[Int])
   }
 
 

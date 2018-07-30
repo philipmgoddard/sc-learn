@@ -2,11 +2,9 @@ package com.kindred.sclearn.estimator
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 
-trait BaseEstimator{
+trait BaseEstimator[T]{
 
-  type T
-
-  type Y <: BaseEstimator
+  type Y <: BaseEstimator[T]
 
   def fit(X: DenseMatrix[Double], y: DenseVector[T]):  Y
 

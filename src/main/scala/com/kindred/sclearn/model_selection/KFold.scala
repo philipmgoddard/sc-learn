@@ -7,7 +7,7 @@ class KFold(nSplits: Int, shuffle: Boolean, randomState: Int) extends BaseCrossV
   // Set the seed on initilisation
   scala.util.Random.setSeed(seed = randomState)
 
-  // generate a stream of (train_ix, test_ix) for slicing a breeze dense matrix
+  // generate a stream of (test_ix, train_ix) for slicing a breeze dense matrix
   override def split(X: DenseMatrix[Double]): Stream[(IndexedSeq[Int], IndexedSeq[Int])] = {
 
     if (X.rows < nSplits) throw new IllegalArgumentException("Cant have more splits than observations")

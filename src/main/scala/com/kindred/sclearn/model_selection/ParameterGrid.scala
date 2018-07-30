@@ -5,6 +5,8 @@ package com.kindred.sclearn.model_selection
 // e.g. Logistic regrssion - C is a double, so we will get C from parameter mapp and create a new logisticregrssionestimator
 // where c = paramgrid.getPOrElse("C", 1.0).asInstanceOf[Double]
 
+
+
   object ParameterGrid {
 
     // perhaps models need to take a default list of tuneable parameters for each model. This should be easily extensible
@@ -28,10 +30,12 @@ package com.kindred.sclearn.model_selection
 class LR(c: Double = LR.c, penalty: String = LR.penalty) {
   println(c)
 }
+
 object LR {
   val c = 1.1
   val penalty = "l1"
 }
+
 object Test extends App {
   val params: Map[String, Any] = Map("penalty" -> 1)
   new LR(c = params.getOrElse("c", LR.c).asInstanceOf[Double],

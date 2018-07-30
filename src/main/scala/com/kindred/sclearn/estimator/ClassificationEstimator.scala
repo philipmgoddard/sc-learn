@@ -3,11 +3,9 @@ package com.kindred.sclearn.estimator
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
 
-trait ClassificationEstimator extends BaseEstimator {
+trait ClassificationEstimator extends BaseEstimator[Int] {
 
-  type T = Int
-
-  type Y = BaseEstimator
+  type Y = ClassificationEstimator
 
   override def fit(X: DenseMatrix[Double], y: DenseVector[Int]): ClassificationEstimator
 
