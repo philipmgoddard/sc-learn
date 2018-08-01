@@ -3,6 +3,9 @@ package com.kindred.sclearn.model_selection
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.estimator.BaseEstimator
 
+
+// TODO: doesnt need to be a class. can just be a function in an object.
+
 /*
 idea: deviate from sklearn api here. a GridSearchCV has a run method, which should
 return an estimator of type V
@@ -26,7 +29,7 @@ class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V,
                                              scoring: (DenseVector[T], DenseVector[T]) => Double,
                                              cv: BaseCrossValidator) {
 
-
+  // do not make this public facing- applu method to access
   def run(X: DenseMatrix[Double], y: DenseVector[T]): GridSearchCVResult[estimator.Y] = {
 
     val resampIndexStream = cv.split(X)
@@ -51,28 +54,12 @@ class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V,
       modelscore = scoring(holdoutPredictions, holdouty)
     } yield ((hp, foldix),  modelscore)
 
-
-    /*
-    val res: List[((Map[String, Any], Int), Double)] = List(((Map("penalty" -> "l1", "C" -> 0.01), 0) , 0.8),
-     ((Map("penalty" -> "l1", "C" -> 0.01), 1), 0.89),
-     ((Map("penalty" -> "l1", "C" -> 0.01), 2), 0.88),
-     ((Map("penalty" -> "l1", "C" -> 0.1), 0) , 0.89),
-     ((Map("penalty" -> "l1", "C" -> 0.1), 1), 0.93),
-     ((Map("penalty" -> "l1", "C" -> 0.1), 2), 0.91)
-    )
-
-
-    // continue from here...
-    res.groupBy(_._1._1)
-
-     */
-
-    // average the results for each hyperparameter. can probably do with a groupBy
-    val avgResults: Map[Map[String, Any], Double] = ???
+    // averagethe results by each hyperparameter
+    val avgResults: List[(Map[String, Any], Double)] = results.groupBy(_._1._1).mapValues(x => x.map(_._2).sum / x.map(_._2).length).toList
     // which params give the best average score. can do with a sort
-    val bestParams: Map[String, Any] = ???
+    val bestParams: Map[String, Any] = avgResults.sortBy(_._2).tail.head._1
     // what is the best average score
-    val bestScore: Double = ???
+    val bestScore: Double = avgResults.sortBy(_._2).tail.head._2
 
     // refit the model to whole training set, using best params
     val finalEstimator: estimator.type = estimator(bestParams)

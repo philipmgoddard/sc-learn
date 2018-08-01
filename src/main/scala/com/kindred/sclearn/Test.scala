@@ -6,7 +6,7 @@ import breeze.optimize.{L1Regularization, L2Regularization}
 import com.kindred.sclearn.estimator.BaseEstimator
 import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
 import com.kindred.sclearn.metrics.{ClassificationMetrics, RegressionMetrics}
-import com.kindred.sclearn.model_selection.KFold
+import com.kindred.sclearn.model_selection.{BaseCrossValidator, GridSearchCV, KFold, ParameterGrid}
 
 object Test extends App {
 
@@ -87,6 +87,14 @@ object Test extends App {
     println("train")
     println(kfTest(y, ::))
   }
+
+
+  val parGrid = ParameterGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
+
+  val gs = new GridSearchCV[Double, LinearRegressionEstimator.type](estimator =  LinearRegressionEstimator , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))
+  val res = gs.run(features, outcome)
+
+  println(res)
 
 //  printFolds(kfTest, kf2.split(kfTest))
 //  println(kf2.getNSplits)
