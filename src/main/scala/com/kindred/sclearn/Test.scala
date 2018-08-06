@@ -91,7 +91,7 @@ object Test extends App {
 
   val parGrid = ParameterGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
 
-  val gs = new GridSearchCV[Double, LinearRegressionEstimator.type](estimator =  LinearRegressionEstimator , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))
+  val gs = new GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))
   val res = gs.run(features, outcome)
 
   println(res)

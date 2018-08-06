@@ -3,6 +3,8 @@ package com.kindred.sclearn.model_selection
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.estimator.BaseEstimator
 
+import scala.reflect.ClassTag
+
 
 // TODO: doesnt need to be a class. can just be a function in an object.
 
@@ -24,13 +26,13 @@ case class GridSearchCVResult[V](resampleResults: List[((Map[String, Any], Int),
                                  bestParams: Map[String, Any])
 
 
-class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V,
-                                             paramGrid: List[Map[String, Any]],
-                                             scoring: (DenseVector[T], DenseVector[T]) => Double,
-                                             cv: BaseCrossValidator) {
+class GridSearchCV[T : ClassTag](val estimator: BaseEstimator[T],
+                                                        paramGrid: List[Map[String, Any]],
+                                                        scoring: (DenseVector[T], DenseVector[T]) => Double,
+                                                        cv: BaseCrossValidator) {
 
   // do not make this public facing- applu method to access
-  def run(X: DenseMatrix[Double], y: DenseVector[T]): GridSearchCVResult[estimator.Y] = {
+  def run(X: DenseMatrix[Double], y: DenseVector[T]): GridSearchCVResult[BaseEstimator[T]] = {
 
     val resampIndexStream = cv.split(X)
     val nResamples = cv.getNSplits
@@ -48,7 +50,8 @@ class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V,
       testX = X(folds._1, ::).toDenseMatrix
       holdouty = y(folds._1).toDenseVector
 
-      estimatorFold: estimator.type = estimator(hp)
+      estimatorFold: BaseEstimator[T] = estimator.run(hp)
+
       fittedEstimatorFold = estimatorFold.fit(trainX, trainy)
       holdoutPredictions = fittedEstimatorFold.predict(testX)
       modelscore = scoring(holdoutPredictions, holdouty)
@@ -62,8 +65,9 @@ class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V,
     val bestScore: Double = avgResults.sortBy(_._2).tail.head._2
 
     // refit the model to whole training set, using best params
-    val finalEstimator: estimator.type = estimator(bestParams)
-    val fittedFinalEstimator = finalEstimator.fit(X, y)
+    val finalEstimator: BaseEstimator[T] = estimator.run(bestParams)
+
+    val fittedFinalEstimator: BaseEstimator[T] = finalEstimator.fit(X, y)
 
     // return the results
     GridSearchCVResult(results, fittedFinalEstimator, bestScore, bestParams)
@@ -74,11 +78,11 @@ class GridSearchCV[T, V <: BaseEstimator[T]](estimator: V,
 
 object GridSearchCV {
 
-  def apply[T, V <: BaseEstimator[T]](estimator: V,
+  def apply[T : ClassTag, V <: BaseEstimator[T]](estimator: V,
                                       paramGrid: List[Map[String, Any]],
                                       scoring: (DenseVector[T], DenseVector[T]) => Double,
-                                      cv: KFold): GridSearchCV[T, V] = {
-    new GridSearchCV[T, V](estimator, paramGrid, scoring, cv)
+                                      cv: KFold): GridSearchCV[T] = {
+    new GridSearchCV[T](estimator, paramGrid, scoring, cv)
   }
 
 }

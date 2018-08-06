@@ -5,12 +5,10 @@ import com.kindred.sclearn.metrics.RegressionMetrics.R2
 
 trait RegressionEstimator extends BaseEstimator[Double] {
 
-  type Y = RegressionEstimator
-
   // fitting a estimator will return a new estimator with members updated so can score
-  override def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  RegressionEstimator
+//  override def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  Y
 
-  override def predict(X: DenseMatrix[Double]): DenseVector[Double]
+//  override def predict(X: DenseMatrix[Double]): DenseVector[Double]
 
   override def score(yPred: DenseVector[Double], y: DenseVector[Double],
                      scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double = defaultScore): Double = {

@@ -11,6 +11,8 @@ class LinearRegressionEstimator(penalty: String, C: Double,
                                 randomState: Integer)
   extends RegressionEstimator with LinearModel {
 
+//  override type Y = LinearRegressionEstimator
+
   // check penalty valid, initialise OptimizationOption object
   checkPenalty(penalty)
   private val optOptions = prepOptOptions(penalty, C, alpha, maxIter, tol, randomState)
@@ -50,6 +52,10 @@ class LinearRegressionEstimator(penalty: String, C: Double,
     } else {
       X * _coef
     }
+  }
+
+  override protected[kindred] def run(paramMap: Map[String, Any]): LinearRegressionEstimator = {
+    LinearRegressionEstimator.apply(paramMap)
   }
 
   // getter for coefficients

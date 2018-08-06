@@ -5,11 +5,9 @@ import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
 
 trait ClassificationEstimator extends BaseEstimator[Int] {
 
-  type Y = ClassificationEstimator
+//  override def fit(X: DenseMatrix[Double], y: DenseVector[Int]):
 
-  override def fit(X: DenseMatrix[Double], y: DenseVector[Int]): ClassificationEstimator
-
-  override def predict(X: DenseMatrix[Double]): DenseVector[Int]
+//  override def predict(X: DenseMatrix[Double]): DenseVector[Int]
 
   def predictProb(X: DenseMatrix[Double]): DenseVector[Double]
 

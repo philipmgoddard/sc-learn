@@ -15,6 +15,8 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
                                   randomState: Integer)
   extends ClassificationEstimator with LinearModel {
 
+//  override type Y = LogisticRegressionEstimator
+
   // check penalty valid, initialise OptimizationOption object
   checkPenalty(penalty)
   private val optOptions = prepOptOptions(penalty, C, alpha, maxIter, tol, randomState)
@@ -67,6 +69,10 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
 
   // getter for intercept, if it is present
   def _intercept: Double = extractIntercept(w, fitIntercept)
+
+  override protected[kindred] def run(paramMap: Map[String, Any]): LogisticRegressionEstimator = {
+    LogisticRegressionEstimator.apply(paramMap)
+  }
 
 }
 
