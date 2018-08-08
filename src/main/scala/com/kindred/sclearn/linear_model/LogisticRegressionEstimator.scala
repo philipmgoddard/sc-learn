@@ -8,14 +8,11 @@ import com.kindred.sclearn.estimator.ClassificationEstimator
 import com.kindred.sclearn.helpers.helpers.addBias
 
 
-// todo: a lot of duplicate code between Linear and Logistic estimators- BaseLinearModel and then inherit?
 class LogisticRegressionEstimator(penalty: String, C: Double,
                                   fitIntercept: Boolean, tol: Double,
                                   maxIter: Integer, alpha: Double,
                                   randomState: Integer)
   extends ClassificationEstimator with LinearModel {
-
-//  override type Y = LogisticRegressionEstimator
 
   // check penalty valid, initialise OptimizationOption object
   checkPenalty(penalty)

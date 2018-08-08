@@ -6,7 +6,7 @@ import breeze.optimize.{L1Regularization, L2Regularization}
 import com.kindred.sclearn.estimator.BaseEstimator
 import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
 import com.kindred.sclearn.metrics.{ClassificationMetrics, RegressionMetrics}
-import com.kindred.sclearn.model_selection.{BaseCrossValidator, GridSearchCV, KFold, ParameterGrid}
+import com.kindred.sclearn.model_selection._
 
 object Test extends App {
 
@@ -91,10 +91,25 @@ object Test extends App {
 
   val parGrid = ParameterGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
 
-  val gs = new GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))
-  val res = gs.run(features, outcome)
 
-  println(res)
+  val gs2 = SearchCV.GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))(features, outcome)
+
+//  println(res)
+  println(gs2)
+  println(gs2.bestScore, gs2.bestParams)
+  val avgres = gs2.resampleResults
+    .groupBy(_._1._1)
+    .mapValues(x => x.map(_._2).sum / x.map(_._2).length)
+    .toList
+
+  println("")
+  println(avgres.sortBy(_._2))//.tail)//.head._1)
+  println(avgres.sortBy(_._2).tail)//.head._1)
+  println(avgres.sortBy(_._2).tail.head)//._1)
+  println(avgres.sortBy(_._2).tail.head._1)
+
+  val xx = gs2.resampleResults.sortBy(_._2).tail.head._1
+
 
 //  printFolds(kfTest, kf2.split(kfTest))
 //  println(kf2.getNSplits)

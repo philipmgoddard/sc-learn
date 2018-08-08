@@ -4,7 +4,6 @@ import breeze.linalg.DenseMatrix
 
 class KFold(nSplits: Int, shuffle: Boolean, randomState: Int) extends BaseCrossValidator {
 
-  // Set the seed on initilisation
   scala.util.Random.setSeed(seed = randomState)
 
   // generate a stream of (test_ix, train_ix) for slicing a breeze dense matrix

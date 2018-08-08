@@ -54,11 +54,14 @@ class LinearRegressionEstimator(penalty: String, C: Double,
     }
   }
 
+  // just a wrapper around apply so that we can generically use in gridsearch
+  // this is NOT part of public api
   override protected[kindred] def run(paramMap: Map[String, Any]): LinearRegressionEstimator = {
     LinearRegressionEstimator.apply(paramMap)
   }
 
   // getter for coefficients
+  // TODO: rename. _coef is python notation. rename coef_ to match sklearn
   def _coef: DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
@@ -87,19 +90,6 @@ object LinearRegressionEstimator {
       randomState=randomState)
   }
 
-//  def apply(penalty: Any = "l2",
-//            C: Any = 1.0,
-//            fitIntercept: Any = true,
-//            tol: Any = 1E-5,
-//            maxIter: Any = 1000,
-//            alpha: Any = 0.5,
-//            randomState: Any = 1234): LinearRegressionEstimator = {
-//    new LinearRegressionEstimator(
-//      penalty = penalty.asInstanceOf[String], C = C.asInstanceOf[Double],
-//      fitIntercept = fitIntercept.asInstanceOf[Boolean], tol = tol.asInstanceOf[Double],
-//      maxIter = maxIter.asInstanceOf[Int], alpha = alpha.asInstanceOf[Double],
-//      randomState = randomState.asInstanceOf[Int])
-//  }
 
   def apply(paramMap: Map[String, Any]): LinearRegressionEstimator = {
     new LinearRegressionEstimator(
