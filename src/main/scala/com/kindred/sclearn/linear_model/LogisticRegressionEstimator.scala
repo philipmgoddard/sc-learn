@@ -57,15 +57,15 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
 
   override def predictProb(X: DenseMatrix[Double]): DenseVector[Double] = {
     val Xb = if (fitIntercept) addBias(X) else X
-    val XCoef = Xb(*, ::) :* _coef
+    val XCoef = Xb(*, ::) :* coef_
     sigmoid(sum(XCoef(*, ::)))
   }
 
   // getter for coefficients
-  def _coef: DenseVector[Double] = extractCoef(w, fitIntercept)
+  def coef_ : DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
-  def _intercept: Double = extractIntercept(w, fitIntercept)
+  def intercept_ : Double = extractIntercept(w, fitIntercept)
 
   override protected[kindred] def run(paramMap: Map[String, Any]): LogisticRegressionEstimator = {
     LogisticRegressionEstimator.apply(paramMap)

@@ -36,7 +36,7 @@ object Test extends App {
   println(lr_est.score(ypred, outcome)) // default: R2
   println(lr_est.score(ypred, outcome, RMSE)) // custom
 
-  println(lr_est._coef)
+  println(lr_est.coef_)
 //  println(lr_est.optOptions)
 //
 //  val HW_data = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
@@ -89,7 +89,7 @@ object Test extends App {
   }
 
 
-  val parGrid = ParameterGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
+  val parGrid = ParamGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
 
 
   val gs2 = SearchCV.GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))(features, outcome)

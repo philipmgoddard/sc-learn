@@ -7,9 +7,10 @@ import scala.reflect.ClassTag
 
 object SearchCV {
 
+
+
+
   // case class to encapsulate output.
-  // this way can remain functional, no need to update a GridSearchCV object and
-  // make it inherit from BaseEstimator traits etc
   case class SearchCVResult[V](resampleResults: List[((Map[String, Any], Int), Double)],
                                finalEstimator: V,
                                bestScore: Double,

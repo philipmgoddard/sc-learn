@@ -61,8 +61,8 @@ trait LinearModel  {
     case None => throw new Exception("Not fitted!")
   }
 
-  def _coef: DenseVector[Double]
+  def coef_ : DenseVector[Double]
 
-  def _intercept: Double
+  def intercept_ : Double
 
 }

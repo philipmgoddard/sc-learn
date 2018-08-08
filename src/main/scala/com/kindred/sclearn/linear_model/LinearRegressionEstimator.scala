@@ -11,8 +11,6 @@ class LinearRegressionEstimator(penalty: String, C: Double,
                                 randomState: Integer)
   extends RegressionEstimator with LinearModel {
 
-//  override type Y = LinearRegressionEstimator
-
   // check penalty valid, initialise OptimizationOption object
   checkPenalty(penalty)
   private val optOptions = prepOptOptions(penalty, C, alpha, maxIter, tol, randomState)
@@ -48,9 +46,9 @@ class LinearRegressionEstimator(penalty: String, C: Double,
   // predict using fitted coefficients
   override def predict(X: DenseMatrix[Double]): DenseVector[Double] = {
     if (fitIntercept) {
-      addBias(X) * DenseVector.vertcat(DenseVector(_intercept), _coef)
+      addBias(X) * DenseVector.vertcat(DenseVector(intercept_), coef_)
     } else {
-      X * _coef
+      X * coef_
     }
   }
 
@@ -62,10 +60,10 @@ class LinearRegressionEstimator(penalty: String, C: Double,
 
   // getter for coefficients
   // TODO: rename. _coef is python notation. rename coef_ to match sklearn
-  def _coef: DenseVector[Double] = extractCoef(w, fitIntercept)
+  def coef_ : DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
-  def _intercept: Double = extractIntercept(w, fitIntercept)
+  def intercept_ : Double = extractIntercept(w, fitIntercept)
 
   // string representation
   override def toString: String =
