@@ -5,7 +5,7 @@ import com.kindred.sclearn.metrics.RegressionMetrics._
 import breeze.optimize.{L1Regularization, L2Regularization}
 import com.kindred.sclearn.estimator.BaseEstimator
 import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
-import com.kindred.sclearn.metrics.{ClassificationMetrics, RegressionMetrics}
+import com.kindred.sclearn.metrics.{ClassificationMetrics, RMSE_, RegressionMetrics}
 import com.kindred.sclearn.model_selection._
 
 object Test extends App {
@@ -34,6 +34,7 @@ object Test extends App {
 //  val ypred: DenseVector[Double] = ???
 
   println(lr_est.score(ypred, outcome)) // default: R2
+  // TODO: see if like this change to API
   println(lr_est.score(ypred, outcome, RMSE)) // custom
 
   println(lr_est._coef)

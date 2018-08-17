@@ -1,5 +1,4 @@
 package com.kindred.sclearn.model_selection
-
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.estimator.BaseEstimator
 
@@ -20,6 +19,7 @@ object SearchCV {
   def GridSearchCV[T: ClassTag](estimator: BaseEstimator[T],
                                 paramGrid: List[Map[String, Any]],
                                 scoring: (DenseVector[T], DenseVector[T]) => Double,
+                                biggerIsBetter: Boolean,
                                 cv: BaseCrossValidator)(X: DenseMatrix[Double], y: DenseVector[T]): SearchCVResult[BaseEstimator[T]] = {
 
     val resampIndexStream = cv.split(X)
@@ -51,9 +51,7 @@ object SearchCV {
       .mapValues(x => x.map(_._2).sum / x.map(_._2).length)
       .toList
 
-    // which params give the best average score. can do with a sort
-    // TODO ask tamas about implicits for this. not all metrics are better when smaller- most better when bigger
-    val bestResult = avgResults.minBy(_._2)
+    val bestResult = if (biggerIsBetter) avgResults.maxBy(_._2) else avgResults.minBy(_._2)
     val bestParams: Map[String, Any] = bestResult._1
     val bestScore: Double = bestResult._2
 

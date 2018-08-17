@@ -7,10 +7,15 @@ trait ClassificationEstimator extends BaseEstimator[Int] {
 
   def predictProb(X: DenseMatrix[Double]): DenseVector[Double]
 
-  override def score(yPred: DenseVector[Int], y: DenseVector[Int],
+  def predict(X: DenseMatrix[Double]): DenseVector[Int]
+
+  def fit(X: DenseMatrix[Double], y: DenseVector[Int]): BaseEstimator[Int]
+
+
+  def score(yPred: DenseVector[Int], y: DenseVector[Int],
                      scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = defaultScore): Double = {
     scoreFunc(yPred, y)
   }
 
-  override def defaultScore: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy _
+   def defaultScore: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy _
 }
