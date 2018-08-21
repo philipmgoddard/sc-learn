@@ -87,7 +87,7 @@ object Test extends App {
   }
 
 
-  val parGrid = ParameterGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
+  val parGrid = ParamGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
 
 
   val gs2 = SearchCV.GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , biggerIsBetter = false, cv=  KFold(nSplit = 2))(features, Some(outcome))

@@ -11,8 +11,6 @@ class LinearRegressionEstimator(penalty: String, C: Double,
                                 randomState: Integer)
   extends RegressionEstimator with LinearModel {
 
-//  override type Y = LinearRegressionEstimator
-
   // check penalty valid, initialise OptimizationOption object
   checkPenalty(penalty)
   private val optOptions = prepOptOptions(penalty, C, alpha, maxIter, tol, randomState)
@@ -67,6 +65,7 @@ class LinearRegressionEstimator(penalty: String, C: Double,
 
   // getter for intercept, if it is present
   override def intercept_ : Double = extractIntercept(w, fitIntercept)
+
 
   // string representation
   override def toString: String =

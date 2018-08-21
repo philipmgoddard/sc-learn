@@ -5,6 +5,9 @@ import com.kindred.sclearn.estimator.{BaseEstimator}
 
 object SearchCV {
 
+
+
+
   // case class to encapsulate output.
   // this way can remain functional, no need to update a GridSearchCV object and
   // make it inherit from BaseEstimator traits etc
@@ -12,6 +15,7 @@ object SearchCV {
                             finalEstimator: BaseEstimator,
                             bestScore: Double,
                             bestParams: Map[String, Any])
+
 
   // GridSearchCV
   // TODO: is there a better way to define estimator as a subtype of Baseestimator???

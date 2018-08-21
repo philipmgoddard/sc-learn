@@ -68,6 +68,7 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
   // getter for intercept, if it is present
   override def intercept_ : Double = extractIntercept(w, fitIntercept)
 
+
   override def toString: String =
     s"LogisticRegressionEstimator(penalty=$penalty, C=$C, fitIntercept=$fitIntercept, tol=$tol, maxIter=$maxIter, alpha=$alpha, randomState=$randomState)"
 
