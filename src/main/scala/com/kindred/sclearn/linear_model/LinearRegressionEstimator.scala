@@ -23,20 +23,21 @@ class LinearRegressionEstimator(penalty: String, C: Double,
   /* some docstring for fit
    *
    * */
-  override def fit(X: DenseMatrix[Double], y: DenseVector[Double]):  LinearRegressionEstimator = {
+  override def fit(X: DenseMatrix[Double], y: Option[DenseVector[Double]]):  LinearRegressionEstimator = {
 
+    val yVal = y.get
     val Xb = if (fitIntercept) addBias(X) else X
 
     // define cost function
     def costFunction(coef: DenseVector[Double], X: DenseMatrix[Double]): Double = {
       val yPred = sum(X * coef)
-      1.0d / (2.0d * X.rows) *  scala.math.pow(sum(yPred - y), 2.0d)
+      1.0d / (2.0d * X.rows) *  scala.math.pow(sum(yPred - yVal), 2.0d)
     }
 
     // define gradient of cost function
     def costFunctionGradient(coef: DenseVector[Double], X: DenseMatrix[Double]): DenseVector[Double] = {
       val xCoef = X * coef
-      X.t * (1.0d / X.rows) * (xCoef - y)
+      X.t * (1.0d / X.rows) * (xCoef - yVal)
     }
 
     val optimalCoef = optimiseLinearModel(costFunction, costFunctionGradient, Xb, optOptions)
@@ -48,9 +49,9 @@ class LinearRegressionEstimator(penalty: String, C: Double,
   // predict using fitted coefficients
   override def predict(X: DenseMatrix[Double]): DenseVector[Double] = {
     if (fitIntercept) {
-      addBias(X) * DenseVector.vertcat(DenseVector(_intercept), _coef)
+      addBias(X) * DenseVector.vertcat(DenseVector(intercept_), coef_)
     } else {
-      X * _coef
+      X * coef_
     }
   }
 
@@ -62,10 +63,10 @@ class LinearRegressionEstimator(penalty: String, C: Double,
 
   // getter for coefficients
   // TODO: rename. _coef is python notation. rename coef_ to match sklearn
-  def _coef: DenseVector[Double] = extractCoef(w, fitIntercept)
+  override def coef_ : DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
-  def _intercept: Double = extractIntercept(w, fitIntercept)
+  override def intercept_ : Double = extractIntercept(w, fitIntercept)
 
   // string representation
   override def toString: String =

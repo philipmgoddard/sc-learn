@@ -24,23 +24,24 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
   /* some docstring
    *
    * */
-  override def fit(X: DenseMatrix[Double], y: DenseVector[Int]):  LogisticRegressionEstimator = {
+  override def fit(X: DenseMatrix[Double], y: Option[DenseVector[Double]]):  LogisticRegressionEstimator = {
 
     // add a bias if fitIntercept is true
     val Xb = if (fitIntercept) addBias(X) else X
+    val yVal = y.get
 
     // define cost function
     def costFunction(coef: DenseVector[Double], X: DenseMatrix[Double]): Double = {
       val xBeta = X * coef
       val expXBeta = exp(xBeta)
-      -1.0d * sum((convert(y, Double) :* xBeta) - log1p(expXBeta))
+      -1.0d * sum(yVal :* xBeta - log1p(expXBeta))
     }
 
     // define gradient of cost function
     def costFunctionGradient(coef: DenseVector[Double], X: DenseMatrix[Double]): DenseVector[Double] = {
       val xBeta = X * coef
       val probs = sigmoid(xBeta)
-      X.t * (probs - convert(y, Double))
+      X.t * (probs - yVal)
     }
 
     val optimalCoef = optimiseLinearModel(costFunction, costFunctionGradient, Xb, optOptions)
@@ -49,25 +50,29 @@ class LogisticRegressionEstimator(penalty: String, C: Double,
     trainedModel
   }
 
-  override def predict(X: DenseMatrix[Double]): DenseVector[Int] = {
+  override def predict(X: DenseMatrix[Double]): DenseVector[Double] = {
     val predProbs = predictProb(X)
     // check if > 0.5 - if yes 1, else 0
-    convert(breeze.numerics.I(predProbs :>= 0.5).toDenseVector, Int)
+    breeze.numerics.I(predProbs :>= 0.5).toDenseVector
   }
 
   override def predictProb(X: DenseMatrix[Double]): DenseVector[Double] = {
     val Xb = if (fitIntercept) addBias(X) else X
-    val XCoef = Xb(*, ::) :* _coef
+    val XCoef = Xb(*, ::) :* coef_
     sigmoid(sum(XCoef(*, ::)))
   }
 
   // getter for coefficients
-  def _coef: DenseVector[Double] = extractCoef(w, fitIntercept)
+  override def coef_ : DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
-  def _intercept: Double = extractIntercept(w, fitIntercept)
+  override def intercept_ : Double = extractIntercept(w, fitIntercept)
 
-  override protected[kindred] def run(paramMap: Map[String, Any]): LogisticRegressionEstimator = {
+  override def toString: String =
+    s"LogisticRegressionEstimator(penalty=$penalty, C=$C, fitIntercept=$fitIntercept, tol=$tol, maxIter=$maxIter, alpha=$alpha, randomState=$randomState)"
+
+
+    override protected[kindred] def run(paramMap: Map[String, Any]): LogisticRegressionEstimator = {
     LogisticRegressionEstimator.apply(paramMap)
   }
 

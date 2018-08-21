@@ -3,19 +3,16 @@ package com.kindred.sclearn.estimator
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
 
-trait ClassificationEstimator extends BaseEstimator[Int] {
+trait ClassificationEstimator extends BaseEstimator {
 
   def predictProb(X: DenseMatrix[Double]): DenseVector[Double]
 
-  def predict(X: DenseMatrix[Double]): DenseVector[Int]
+  def predict(X: DenseMatrix[Double]): DenseVector[Double]
 
-  def fit(X: DenseMatrix[Double], y: DenseVector[Int]): BaseEstimator[Int]
-
-
-  def score(yPred: DenseVector[Int], y: DenseVector[Int],
-                     scoreFunc: (DenseVector[Int], DenseVector[Int]) => Double = defaultScore): Double = {
+  def score(yPred: DenseVector[Double], y: DenseVector[Double],
+                     scoreFunc: (DenseVector[Double], DenseVector[Double]) => Double = defaultScore): Double = {
     scoreFunc(yPred, y)
   }
 
-   def defaultScore: (DenseVector[Int], DenseVector[Int]) => Double = Accuracy _
+   def defaultScore: (DenseVector[Double], DenseVector[Double]) => Double = Accuracy _
 }

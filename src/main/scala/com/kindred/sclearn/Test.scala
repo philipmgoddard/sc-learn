@@ -2,10 +2,7 @@ package com.kindred.sclearn
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.RegressionMetrics._
-import breeze.optimize.{L1Regularization, L2Regularization}
-import com.kindred.sclearn.estimator.BaseEstimator
-import com.kindred.sclearn.linear_model.{LinearRegressionEstimator, LogisticRegressionEstimator}
-import com.kindred.sclearn.metrics.{ClassificationMetrics, RMSE_, RegressionMetrics}
+import com.kindred.sclearn.linear_model.{LinearRegressionEstimator}
 import com.kindred.sclearn.model_selection._
 
 object Test extends App {
@@ -14,9 +11,9 @@ object Test extends App {
   val features = DenseMatrix((1.0, 4.0, 2.0), (6.3, 8.7, 2.3), (6.6, 8.9, 2.1))
   val outcome = DenseVector(0.3, 5.0, 4.9)
 //  val lr_est =  LinearRegressionEstimator(scoreFunc = R2, optOptions = List(L2Regularization(0.001))).fit(features, outcome)
-  val lr_est =  LinearRegressionEstimator(penalty = "l2", C = 10.0).fit(features, outcome)
+  val lr_est =  LinearRegressionEstimator(penalty = "l2", C = 10.0).fit(features, Some(outcome))
 
-  val lr_est2 =  LinearRegressionEstimator(Map("penalty" -> "l1", "C" -> 10.0)).fit(features, outcome)
+  val lr_est2 =  LinearRegressionEstimator(Map("penalty" -> "l1", "C" -> 10.0)).fit(features, Some(outcome))
 
 
   println(lr_est)
@@ -37,7 +34,7 @@ object Test extends App {
   // TODO: see if like this change to API
   println(lr_est.score(ypred, outcome, RMSE)) // custom
 
-  println(lr_est._coef)
+  println(lr_est.coef_)
 //  println(lr_est.optOptions)
 //
 //  val HW_data = DenseMatrix((77.0, 182.0), (53.0, 161.0), (65.0, 171.0), (70.0, 175.0))
@@ -93,23 +90,23 @@ object Test extends App {
   val parGrid = ParameterGrid.cross(Map("penalty" -> List("l1", "l2"), "C" -> List(0.01, 0.1, 1.0)))
 
 
-  val gs2 = SearchCV.GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , cv=  KFold(nSplit = 2))(features, outcome)
+  val gs2 = SearchCV.GridSearchCV(estimator =  lr_est , paramGrid = parGrid, scoring=  RMSE , biggerIsBetter = false, cv=  KFold(nSplit = 2))(features, Some(outcome))
 
 //  println(res)
   println(gs2)
   println(gs2.bestScore, gs2.bestParams)
-  val avgres = gs2.resampleResults
-    .groupBy(_._1._1)
-    .mapValues(x => x.map(_._2).sum / x.map(_._2).length)
-    .toList
-
-  println("")
-  println(avgres.sortBy(_._2))//.tail)//.head._1)
-  println(avgres.sortBy(_._2).tail)//.head._1)
-  println(avgres.sortBy(_._2).tail.head)//._1)
-  println(avgres.sortBy(_._2).tail.head._1)
-
-  val xx = gs2.resampleResults.sortBy(_._2).tail.head._1
+//  val avgres = gs2.resampleResults
+//    .groupBy(_._1._1)
+//    .mapValues(x => x.map(_._2).sum / x.map(_._2).length)
+//    .toList
+//
+//  println("")
+//  println(avgres.sortBy(_._2))//.tail)//.head._1)
+//  println(avgres.sortBy(_._2).tail)//.head._1)
+//  println(avgres.sortBy(_._2).tail.head)//._1)
+//  println(avgres.sortBy(_._2).tail.head._1)
+//
+//  val xx = gs2.resampleResults.sortBy(_._2).tail.head._1
 
 
 //  printFolds(kfTest, kf2.split(kfTest))
