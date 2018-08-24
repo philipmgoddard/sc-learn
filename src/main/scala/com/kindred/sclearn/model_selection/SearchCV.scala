@@ -1,6 +1,6 @@
 package com.kindred.sclearn.model_selection
 import breeze.linalg.{DenseMatrix, DenseVector}
-import com.kindred.sclearn.estimator.{BaseEstimator}
+import com.kindred.sclearn.estimator.BaseCat
 
 
 object SearchCV {
@@ -12,14 +12,14 @@ object SearchCV {
   // this way can remain functional, no need to update a GridSearchCV object and
   // make it inherit from BaseEstimator traits etc
   case class SearchCVResult(resampleResults: List[((Map[String, Any], Int), Double)],
-                            finalEstimator: BaseEstimator,
+                            finalEstimator: BaseCat,
                             bestScore: Double,
                             bestParams: Map[String, Any])
 
 
   // GridSearchCV
   // TODO: is there a better way to define estimator as a subtype of Baseestimator???
-  def GridSearchCV(estimator: BaseEstimator ,
+  def GridSearchCV(estimator: BaseCat ,
                    paramGrid: List[Map[String, Any]],
                    scoring: (DenseVector[Double], DenseVector[Double]) => Double,
                    biggerIsBetter: Boolean,
@@ -62,7 +62,7 @@ object SearchCV {
     val bestScore: Double = bestResult._2
 
     // refit the model to whole training set, using best params
-    val fittedFinalEstimator: BaseEstimator = estimator.run(bestParams).fit(X, y)
+    val fittedFinalEstimator: BaseCat= estimator.run(bestParams).fit(X, y)
 
     // return the results
     SearchCVResult(results, fittedFinalEstimator, bestScore, bestParams)

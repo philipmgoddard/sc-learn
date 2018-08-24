@@ -11,8 +11,6 @@ class StandardScaler extends BaseTransformer  {
 
   override def fit(X: DenseMatrix[Double], y: Option[DenseVector[Double]]): BaseEstimator = ???
 
-  override def predict(X: DenseMatrix[Double]): DenseVector[Double] = ???
 
-  override protected[kindred] def run(paramMap: Map[String, Any]): BaseEstimator = ???
 
 }

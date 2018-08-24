@@ -3,7 +3,7 @@ package com.kindred.sclearn.estimator
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.kindred.sclearn.metrics.ClassificationMetrics.Accuracy
 
-trait ClassificationEstimator extends BaseEstimator {
+trait ClassificationEstimator extends BaseCat {
 
   def predictProb(X: DenseMatrix[Double]): DenseVector[Double]
 
