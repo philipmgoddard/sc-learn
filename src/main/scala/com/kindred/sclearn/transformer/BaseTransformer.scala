@@ -1,6 +1,6 @@
 package com.kindred.sclearn.transformer
 
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.{DenseMatrix}
 import com.kindred.sclearn.estimator.BaseEstimator
 
 trait BaseTransformer extends BaseEstimator {

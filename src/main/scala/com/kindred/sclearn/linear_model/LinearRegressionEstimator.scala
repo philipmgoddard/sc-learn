@@ -60,7 +60,6 @@ class LinearRegressionEstimator(penalty: String, C: Double,
   }
 
   // getter for coefficients
-  // TODO: rename. _coef is python notation. rename coef_ to match sklearn
   override def coef_ : DenseVector[Double] = extractCoef(w, fitIntercept)
 
   // getter for intercept, if it is present
